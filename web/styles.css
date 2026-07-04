@@ -522,24 +522,52 @@ body[data-view="plan"] #view-plan { display: flex; }
   font-weight: 600;
 }
 
-/* Flow stack — vertical scroll of per-turn cards */
+/* Flow stack — single outer box, translucent dividers between turns */
 .flow-stack-panel { flex: 1 1 auto; min-height: 0; }
 .flow-stack {
   overflow-y: auto;
-  padding: 10px 12px 20px;
+  padding: 4px 0 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0;
   flex: 1;
+  background: var(--bg-card);
 }
 .turn-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  padding: 8px 10px 12px;
+  background: transparent;
+  border: 0;
+  padding: 20px 8px 22px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  position: relative;
 }
+.turn-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px;
+  margin: 0;
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(to bottom, rgba(217,69,58,0.02), rgba(217,69,58,0));
+}
+.turn-divider::before, .turn-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.05);
+}
+.turn-divider .div-caption {
+  color: var(--accent-red-dim);
+  font-weight: 600;
+}
+.turn-divider .div-caption strong { color: var(--accent-red); font-weight: 500; letter-spacing: 0; }
+
 .turn-card .turn-card-head {
   display: flex;
   justify-content: space-between;
@@ -583,7 +611,7 @@ body[data-view="plan"] #view-plan { display: flex; }
 
 .turn-card-svg { width: 100%; display: block; background: transparent; }
 
-/* DAG nodes */
+/* DAG nodes — portrait, centered text, larger gaps */
 .dag-node .dag-shape {
   fill: var(--bg-elev);
   stroke: var(--border-strong);
@@ -597,15 +625,15 @@ body[data-view="plan"] #view-plan { display: flex; }
 }
 .dag-node.done .dag-shape { fill: var(--bg-elev2); stroke: var(--accent-red-dim); }
 .dag-node.error .dag-shape { fill: rgba(255,80,80,0.12); stroke: #ff6060; }
-.dag-node.selected .dag-shape { stroke: var(--accent-red-bright); stroke-width: 2.2; }
+.dag-node.selected .dag-shape { stroke: var(--accent-red-bright); stroke-width: 2.4; }
 .dag-node { cursor: pointer; }
 
 .dag-node.tool .dag-shape { fill: rgba(217, 69, 58, 0.06); stroke: var(--accent-red-dim); }
-.dag-node.web .dag-shape { fill: rgba(217, 69, 58, 0.10); stroke: var(--accent-red-dim); stroke-dasharray: 3 2; }
+.dag-node.web .dag-shape { fill: rgba(217, 69, 58, 0.12); stroke: var(--accent-red-dim); stroke-dasharray: 3 2; }
 
 @keyframes dag-pulse {
   0%,100% { fill: var(--accent-red-tint); }
-  50%     { fill: rgba(217, 69, 58, 0.28); }
+  50%     { fill: rgba(217, 69, 58, 0.32); }
 }
 
 .dag-node foreignObject { pointer-events: none; }
@@ -613,51 +641,154 @@ body[data-view="plan"] #view-plan { display: flex; }
   color: var(--text-main);
   font-family: var(--font-sans);
   font-size: 10.5px;
-  line-height: 1.22;
-  padding: 3px 6px;
+  line-height: 1.25;
+  padding: 6px 6px;
   overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1px;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
 }
 .dag-node .node-fo .node-label {
   font-weight: 500;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   word-break: break-word;
+  width: 100%;
 }
 .dag-node .node-fo .node-sub {
   color: var(--text-dim);
-  font-size: 8.5px;
+  font-size: 9px;
   font-family: var(--font-mono);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: 100%;
+  text-transform: uppercase;
 }
 .dag-node.web .node-fo .node-label { color: var(--accent-red-bright); }
 
-/* DAG edges */
-.dag-edge { stroke: var(--border-strong); stroke-width: 1; fill: none; }
+/* User Q node is a wide banner across the top of the card */
+.dag-node.user .node-fo {
+  font-size: 12px;
+  padding: 8px 12px;
+  -webkit-line-clamp: 3;
+}
+.dag-node.user .node-fo .node-label {
+  -webkit-line-clamp: 3;
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+/* DAG edges — brighter/thicker so they stand out with wider gaps */
+.dag-edge { stroke: var(--border-strong); stroke-width: 1.2; fill: none; }
 .dag-edge.active {
   stroke: var(--accent-red);
-  stroke-width: 1.4;
+  stroke-width: 1.6;
   stroke-dasharray: 4 4;
   animation: dashflow 0.8s linear infinite;
 }
 @keyframes dashflow { to { stroke-dashoffset: -16; } }
-.dag-edge.done { stroke: var(--accent-red-dim); }
-.dag-edge.iter-loop { stroke: var(--accent-red-dim); stroke-width: 0.8; stroke-dasharray: 2 2; opacity: 0.6; }
+.dag-edge.done { stroke: var(--accent-red-dim); stroke-width: 1.2; }
+.dag-edge.iter-loop { stroke: var(--accent-red-dim); stroke-width: 0.9; stroke-dasharray: 2 3; opacity: 0.7; }
 .dag-edge.tool-out {
   stroke: var(--accent-red-dim);
-  stroke-width: 0.8;
+  stroke-width: 1;
   stroke-dasharray: 2 3;
-  opacity: 0.55;
+  opacity: 0.6;
 }
+
+/* Spine (HOT sources rail on left of card) */
+.spine-node { cursor: pointer; }
+.spine-node .spine-shape {
+  fill: var(--bg-elev);
+  stroke: var(--border-subtle);
+  stroke-width: 1;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+.spine-node.hit .spine-shape {
+  fill: var(--accent-red-tint);
+  stroke: var(--accent-red);
+  animation: spine-hit-pulse 1.6s ease-in-out infinite;
+}
+.spine-node.new .spine-shape {
+  stroke: var(--accent-red-bright);
+  stroke-dasharray: 4 2;
+}
+.spine-node.dim .spine-shape {
+  fill: var(--bg-card);
+  stroke: rgba(255,255,255,0.05);
+  opacity: 0.6;
+}
+.spine-node.evicted .spine-shape {
+  fill: transparent;
+  stroke: rgba(255,80,80,0.35);
+  stroke-dasharray: 2 3;
+  opacity: 0.5;
+}
+@keyframes spine-hit-pulse {
+  0%,100% { fill: var(--accent-red-tint); }
+  50%     { fill: rgba(217, 69, 58, 0.28); }
+}
+.spine-node .spine-fo {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.2;
+  padding: 4px 5px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  letter-spacing: 0.01em;
+}
+.spine-node .spine-fo .spine-title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  font-size: 9px;
+  color: var(--text-main);
+}
+.spine-node .spine-fo .spine-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  color: var(--text-dim);
+  font-size: 8.5px;
+}
+.spine-node.hit .spine-fo .spine-meta { color: var(--accent-red); }
+.spine-node.evicted .spine-fo .spine-title {
+  text-decoration: line-through;
+  color: var(--text-mute);
+}
+.spine-node.dim .spine-fo .spine-title,
+.spine-node.dim .spine-fo .spine-meta {
+  color: var(--text-mute);
+}
+
+/* Spine header (small label above the rail) */
+.spine-header {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--text-dim);
+}
+
+/* Spine → node arcs */
+.spine-arc { stroke: var(--accent-red-dim); stroke-width: 0.8; stroke-dasharray: 2 3; fill: none; opacity: 0.45; }
+.spine-arc.hit { stroke: var(--accent-red); opacity: 0.75; }
 
 /* Detail slide-over (over the flow column) */
 .detail-slideover {

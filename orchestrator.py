@@ -288,6 +288,11 @@ def run_turn(user_q: str) -> Iterator[dict]:
                      "tool_calls": wf["tool_calls"],
                      "error": wf["error"]} for wf in findings],
         "source_ids": list(seen),
+        "sources_meta": [{"source_id": s["source_id"],
+                          "source_title": s.get("source_title",""),
+                          "source_url": s.get("source_url",""),
+                          "score_after": s.get("score", 0),
+                          "hits_total": s.get("hits_total", 1)} for s in all_sources],
         "cost_dollars": round(turn_cost.total_dollars, 4),
     })
     session_costs.append(turn_cost)
