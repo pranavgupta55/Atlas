@@ -23,10 +23,10 @@
       <button class="tab" data-view="plan">Plan</button>
     </div>
     <div class="topbar-right">
-      <label class="cheap-toggle" title="All-Haiku mode: swaps every model to claude-haiku-4-5 (~6× cheaper). Takes effect on the next turn.">
+      <label class="cheap-toggle" title="Cheap mode — swaps every model to claude-haiku-4-5 (~6× cheaper). Takes effect on the next turn.">
         <input type="checkbox" id="cheap-toggle">
         <span class="cheap-slider"></span>
-        <span class="cheap-label">$$$</span>
+        <span class="cheap-label">Cheap · Haiku</span>
       </label>
       <span class="cost-pill" id="cost-pill" title="Click for cost breakdown">$0.00</span>
       <span class="status-pill" id="status-pill">…</span>
@@ -37,7 +37,7 @@
   <main id="view-chat" class="view active">
     <div id="messages" class="messages"></div>
     <div class="composer">
-      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…  (⌘/Ctrl+Enter to send, /distill /sources /reset /cost)"></textarea>
+      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…  (Enter to send · Shift+Enter for new line · /distill /sources /reset /cost)"></textarea>
       <button id="send">Send</button>
     </div>
   </main>
@@ -48,8 +48,14 @@
       <div class="flow-left">
         <section class="flow-panel dag-panel">
           <header class="flow-header">
-            <h2>Turn <span id="dag-turn-label">—</span></h2>
-            <span class="flow-hint">Click any node for details →</span>
+            <h2>Turn<span class="turn-label" id="dag-turn-label">—</span></h2>
+            <div class="turn-nav" id="turn-nav">
+              <button id="turn-prev" title="Previous turn">‹</button>
+              <span class="nav-badge" id="turn-nav-badge">—</span>
+              <button id="turn-next" title="Next turn / live">›</button>
+              <button id="turn-live" title="Jump to current live turn" style="margin-left:6px">LIVE</button>
+            </div>
+            <span class="flow-hint">Click any node for details</span>
           </header>
           <svg id="dag-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </section>

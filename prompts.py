@@ -29,7 +29,7 @@ then synthesize the responses into one dense, cited answer streamed to the user.
 
 <synthesis_rules>
 - Take worker findings, merge into ONE reply.
-- Preserve every [source_id] citation exactly.
+- Preserve every [source_id] citation exactly. Multiple citations = separate brackets: `[a][b]`, NEVER `[a, b]` or `[web:x.com, web:y.com]`.
 - Order by user's likely priority: most-actionable first, background last.
 - No preamble, no restating the question, no "here is a summary". Start with the answer.
 - ≤50 lines total. Every line ≤25 words. If it doesn't help the user act, cut it.
@@ -61,7 +61,8 @@ Never fabricate a source_id.
 
 <citation_format>
 Every claim: `<claim> [<source_id>]` or `<claim> [web:<domain>]`.
-Multi-source: `[<id1>][<id2>]`.
+Multi-source: each source in its OWN pair of brackets — `[<id1>][<id2>][web:<a.com>][web:<b.com>]`.
+NEVER combine multiple sources inside one bracket. NEVER write `[web:a.com, web:b.com]` — always split into `[web:a.com][web:b.com]`.
 </citation_format>
 
 <density_rules>

@@ -24,8 +24,19 @@
     ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"}[c]));
 
   function renderMarkdown(text) {
-    // Decorate [source::sub] and [web:...] citations
-    const decorated = text.replace(
+    // First, split multi-source brackets: `[web:a.com, web:b.com]` → `[web:a.com][web:b.com]`
+    // and `[src::A, src::B]` → `[src::A][src::B]`
+    let normalized = text.replace(/\[([^\]\[]+)\]/g, (match, inner) => {
+      // Detect bracket containing multiple citations separated by comma+space
+      const looksLikeCitation = /^(web:|[A-Za-z0-9_\-\.]+::)/.test(inner.trim());
+      if (!looksLikeCitation) return match;
+      if (!inner.includes(",")) return match;
+      const parts = inner.split(/,\s*/).map(p => p.trim()).filter(Boolean);
+      return parts.map(p => `[${p}]`).join("");
+    });
+
+    // Now decorate individual [source::sub] and [web:...] citations
+    const decorated = normalized.replace(
       /\[([A-Za-z0-9_\-\.]+::[A-Za-z0-9_\-\.: ]+?)\]|\[(web:[^\]]+?)\]/g,
       (_, sid, webid) => {
         const id = sid || webid;
@@ -98,16 +109,24 @@
     currentBubble.innerHTML = renderMarkdown(t.answer_text || currentBubble.textContent);
     wireCitations(currentBubble);
 
-    // Source list under the message
+    // Source list under the message — 2-column scrollable grid
     if (t.sources && t.sources.length) {
       const s = el("div", "sources");
       s.appendChild(el("h4", null, `Sources (${t.sources.length})`));
+      const grid = el("div", "src-grid");
       t.sources.forEach(src => {
-        const line = el("div", "src");
         const title = src.source_title || src.source_name || src.source_id;
-        line.innerHTML = `<a href="${src.source_url || '#'}" target="_blank">${escapeHtml(title)}</a> <span class="sid">${escapeHtml(src.source_id)}</span>`;
-        s.appendChild(line);
+        const titleCell = el("div", "src-title");
+        if (src.source_url) {
+          titleCell.innerHTML = `<a href="${escapeHtml(src.source_url)}" target="_blank">${escapeHtml(title)}</a>`;
+        } else {
+          titleCell.textContent = title;
+        }
+        const sidCell = el("div", "src-sid", src.source_id);
+        grid.appendChild(titleCell);
+        grid.appendChild(sidCell);
       });
+      s.appendChild(grid);
       currentBubble.after(s);
     }
 
@@ -224,6 +243,10 @@
 
   sendBtn.addEventListener("click", send);
   inputEl.addEventListener("keydown", e => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); send(); }
+    // Enter = submit. Shift+Enter = newline. Cmd/Ctrl+Enter also submits (safety).
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
   });
 })();
