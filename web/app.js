@@ -2,7 +2,7 @@
 
 window.Atlas = (function() {
   const state = {
-    view: "chat",
+    view: "main",
     session: {
       dollars: 0, today_dollars: 0, sources_warm: 0, history_turns: 0,
       session_cap: 10, daily_cap: 25,
@@ -75,7 +75,7 @@ window.Atlas = (function() {
     document.getElementById("status-pill").textContent =
       `${state.session.sources_warm} warm · ${state.session.history_turns} turns${modelSuffix}`;
   }
-  document.getElementById("cost-pill").addEventListener("click", () => setView("flow"));
+  document.getElementById("cost-pill").addEventListener("click", () => setView("main"));
 
   // Cheap-mode toggle
   const cheapEl = document.getElementById("cheap-toggle");

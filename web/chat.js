@@ -109,12 +109,14 @@
     currentBubble.innerHTML = renderMarkdown(t.answer_text || currentBubble.textContent);
     wireCitations(currentBubble);
 
-    // Source list under the message — 2-column scrollable grid
+    // Source list under the message — 3-col scrollable grid: title | counter | id
+    // Sorted DESC by internal score (server sends already sorted, we defensively re-sort).
     if (t.sources && t.sources.length) {
+      const sorted = [...t.sources].sort((a, b) => (b.score || 0) - (a.score || 0));
       const s = el("div", "sources");
-      s.appendChild(el("h4", null, `Sources (${t.sources.length})`));
+      s.appendChild(el("h4", null, `Sources (${sorted.length})`));
       const grid = el("div", "src-grid");
-      t.sources.forEach(src => {
+      sorted.forEach(src => {
         const title = src.source_title || src.source_name || src.source_id;
         const titleCell = el("div", "src-title");
         if (src.source_url) {
@@ -122,8 +124,12 @@
         } else {
           titleCell.textContent = title;
         }
+        const counterCell = el("div", "src-counter");
+        counterCell.textContent = (src.score || 0).toFixed(1);
+        counterCell.title = `score ${(src.score || 0).toFixed(2)} · hits ${src.hits_total || 1}`;
         const sidCell = el("div", "src-sid", src.source_id);
         grid.appendChild(titleCell);
+        grid.appendChild(counterCell);
         grid.appendChild(sidCell);
       });
       s.appendChild(grid);

@@ -256,7 +256,7 @@ def run_turn(user_q: str) -> Iterator[dict]:
            "output_tokens": turn_cost.calls[-1].output_tokens,
            "turn_total": round(turn_cost.total_dollars, 4)}
 
-    # 4. Unique source list
+    # 4. Unique source list — enrich with score/hits from context store (post-hit-update, pre-decay)
     seen = set()
     all_sources = []
     for wf in findings:
@@ -265,13 +265,17 @@ def run_turn(user_q: str) -> Iterator[dict]:
             if sid in seen:
                 continue
             seen.add(sid)
+            entry = cs._entries.get(sid)
             all_sources.append({
                 "source_id": sid,
                 "source_name": s.get("source_name",""),
                 "source_title": s.get("source_title",""),
                 "source_url": s.get("source_url",""),
                 "snippet": (s.get("full_text","") or "")[:400],
+                "score": round(entry.score, 2) if entry else 0.0,
+                "hits_total": entry.hits_total if entry else 1,
             })
+    all_sources.sort(key=lambda r: (-r["score"], -r["hits_total"]))
     yield {"type": "sources", "sources": all_sources}
 
     # 5. Persist
