@@ -22,6 +22,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+import config as atlas_config
 import context_store
 import costs
 import orchestrator
@@ -38,6 +39,7 @@ app = FastAPI(title="Atlas", version="0.2.0")
 @app.get("/api/status")
 def status():
     sc = costs.SessionCosts(DATA_DIR / "costs.jsonl")
+    cfg = atlas_config.get()
     return {
         "ok": True,
         "sources_warm": _size_context(),
@@ -47,7 +49,28 @@ def status():
         "today_dollars": round(sc.today_dollars(), 4),
         "session_cap": costs.SESSION_CAP_USD,
         "daily_cap": costs.DAILY_CAP_USD,
+        "cheap_mode": cfg.get("cheap_mode", False),
+        "models": {
+            "orch":   atlas_config.models()[0],
+            "worker": atlas_config.models()[1],
+            "merge":  atlas_config.models()[2],
+        },
     }
+
+
+class ConfigPatch(BaseModel):
+    cheap_mode: bool | None = None
+
+
+@app.get("/api/config")
+def config_get():
+    return atlas_config.get()
+
+
+@app.post("/api/config")
+def config_set(patch: ConfigPatch):
+    p = {k: v for k, v in patch.model_dump().items() if v is not None}
+    return atlas_config.set(p)
 
 
 # ── business.md GET/POST ──────────────────────────────────────────────

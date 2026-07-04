@@ -16,14 +16,12 @@ from typing import Iterator
 
 import anthropic
 
+import config
 import context_store
 import costs
 import prompts
 import retry
 import worker
-
-ORCH_MODEL  = os.environ.get("ATLAS_ORCH_MODEL",  "claude-opus-4-7")
-MERGE_MODEL = os.environ.get("ATLAS_MERGE_MODEL", "claude-sonnet-4-6")
 
 ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
@@ -83,16 +81,18 @@ def _plan_workers(client: anthropic.Anthropic, user_q: str,
 Decompose per orchestrator rules. {prompts.PLAN_JSON_SCHEMA}
 """
 
+    orch_model, _, _ = config.models()
+
     def _create():
         return client.messages.create(
-            model=ORCH_MODEL,
+            model=orch_model,
             max_tokens=1200,
             system=prompts.ORCHESTRATOR_SYSTEM,
             messages=[{"role": "user", "content": planning_prompt}],
         )
     resp = retry.with_retry(_create, max_attempts=3, base_delay=1.5)
     in_t, out_t = costs.usage_from_response(resp)
-    turn_cost.add_call("plan", ORCH_MODEL, in_t, out_t, label="orchestrator plan")
+    turn_cost.add_call("plan", orch_model, in_t, out_t, label="orchestrator plan")
 
     text = "".join(b.text for b in resp.content if getattr(b, "type", None) == "text").strip()
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
@@ -124,9 +124,11 @@ Synthesize per the synthesis_rules. Preserve every [source_id] citation.
 Start with the answer — no preamble, no restatement, no wrap-up.
 """
 
+    _, _, merge_model = config.models()
+
     def _open():
         return client.messages.stream(
-            model=MERGE_MODEL,
+            model=merge_model,
             max_tokens=2500,
             system=prompts.ORCHESTRATOR_SYSTEM,
             messages=[{"role": "user", "content": merge_prompt}],
@@ -137,7 +139,7 @@ Start with the answer — no preamble, no restatement, no wrap-up.
             yield text
         final = s.get_final_message()
         in_t, out_t = costs.usage_from_response(final)
-        turn_cost.add_call("merge", MERGE_MODEL, in_t, out_t, label="merger")
+        turn_cost.add_call("merge", merge_model, in_t, out_t, label="merger")
 
 
 def run_turn(user_q: str) -> Iterator[dict]:
@@ -216,7 +218,8 @@ def run_turn(user_q: str) -> Iterator[dict]:
                     full_text=s.get("full_text",""),
                     breadcrumb=(s.get("full_text","") or "")[:200],
                 )
-            turn_cost.add_call("worker", worker.WORKER_MODEL, res.input_tokens, res.output_tokens,
+            turn_cost.add_call("worker", res.model or config.models()[1],
+                               res.input_tokens, res.output_tokens,
                                label=f"worker#{i}: {plan[i]['focus']}")
             if res.web_searches:
                 turn_cost.add_web_search(res.web_searches)
@@ -358,9 +361,11 @@ Propose the new business.md per the archivist rules. Output the full markdown on
 
     yield {"type": "distill_start"}
 
+    _, _, merge_model = config.models()
+
     def _open():
         return client.messages.stream(
-            model=MERGE_MODEL,
+            model=merge_model,
             max_tokens=4000,
             system=prompts.DISTILL_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}],

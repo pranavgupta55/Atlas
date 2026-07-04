@@ -14,12 +14,12 @@ from typing import Any, Callable
 
 import anthropic
 
+import config
 import costs
 import prompts
 import retry
 import scribe_client
 
-WORKER_MODEL = os.environ.get("ATLAS_WORKER_MODEL", "claude-sonnet-4-6")
 MAX_TOOL_LOOPS = 6
 
 SCRIBE_TOOL = {
@@ -55,6 +55,7 @@ class WorkerResult:
     output_tokens: int = 0
     web_searches: int = 0
     tool_calls: list[dict] = field(default_factory=list)  # for Flow view drilldown
+    model: str = ""
 
 
 def _run_scribe(sub_queries: list[str], k_facts: int, k_chunks: int) -> tuple[dict, list[dict]]:
@@ -119,13 +120,14 @@ def run_worker(
     messages: list[dict[str, Any]] = [{"role": "user", "content": user_content}]
 
     result = WorkerResult(findings="")
+    result.model = config.models()[1]
     called_scribe = False
     tool_call_seq = 0
 
     for _ in range(MAX_TOOL_LOOPS):
         def _create():
             return client.messages.create(
-                model=WORKER_MODEL,
+                model=result.model,
                 max_tokens=2500,
                 system=prompts.WORKER_SYSTEM,
                 tools=[SCRIBE_TOOL, WEB_TOOL],

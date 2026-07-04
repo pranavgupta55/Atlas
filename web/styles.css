@@ -119,6 +119,48 @@ html, body {
 .cost-pill { color: var(--accent-red); font-weight: 500; cursor: pointer; }
 .cost-pill:hover { border-color: var(--accent-red-dim); }
 
+/* Cheap-mode toggle */
+.cheap-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.cheap-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.cheap-slider {
+  position: relative;
+  width: 34px; height: 18px;
+  background: var(--bg-elev2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.cheap-slider::before {
+  content: "";
+  position: absolute;
+  left: 2px; top: 1px;
+  width: 12px; height: 12px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.cheap-toggle input:checked + .cheap-slider {
+  background: var(--accent-red-dim);
+  border-color: var(--accent-red);
+}
+.cheap-toggle input:checked + .cheap-slider::before {
+  transform: translateX(16px);
+  background: var(--accent-red);
+}
+.cheap-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+.cheap-toggle input:checked ~ .cheap-label { color: var(--accent-red); }
+
 /* ── Views ─────────────────────────────────────────────────────────── */
 .view {
   display: none;

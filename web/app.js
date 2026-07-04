@@ -67,10 +67,33 @@ window.Atlas = (function() {
     const pct = Math.min(1, (state.session.dollars || 0) / cap);
     if (pct > 0.8) pill.style.borderColor = "#ef5a4d";
     else pill.style.borderColor = "";
+    const cheap = document.getElementById("cheap-toggle").checked;
+    const modelSuffix = cheap ? " · haiku" : "";
     document.getElementById("status-pill").textContent =
-      `${state.session.sources_warm} warm · ${state.session.history_turns} turns`;
+      `${state.session.sources_warm} warm · ${state.session.history_turns} turns${modelSuffix}`;
   }
   document.getElementById("cost-pill").addEventListener("click", () => setView("flow"));
+
+  // Cheap-mode toggle
+  const cheapEl = document.getElementById("cheap-toggle");
+  async function loadCheapState() {
+    try {
+      const c = await (await fetch("/api/config")).json();
+      cheapEl.checked = !!c.cheap_mode;
+      updateStatusUI();
+    } catch (e) { /* ignore */ }
+  }
+  cheapEl.addEventListener("change", async () => {
+    try {
+      await fetch("/api/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cheap_mode: cheapEl.checked }),
+      });
+      refreshStatus();
+    } catch (e) { console.error(e); }
+  });
+  loadCheapState();
 
   // ── SSE parsing helper ────────────────────────────────────────────
   async function sseFetch(url, body, onEvent) {
