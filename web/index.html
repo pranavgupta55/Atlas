@@ -37,7 +37,7 @@
   <main id="view-chat" class="view active">
     <div id="messages" class="messages"></div>
     <div class="composer">
-      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…  (Enter to send, Shift+Enter for newline · /distill /sources /reset /cost)"></textarea>
+      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…  (⌘/Ctrl+Enter to send, /distill /sources /reset /cost)"></textarea>
       <button id="send">Send</button>
     </div>
   </main>
@@ -116,9 +116,10 @@
     </div>
   </main>
 
+  <!-- app.js defines window.Atlas — must load BEFORE anything that references it. -->
+  <script src="/web/app.js"></script>
   <script src="/web/chat.js"></script>
   <script src="/web/flow.js"></script>
   <script src="/web/plan.js"></script>
-  <script src="/web/app.js"></script>
 </body>
 </html>
