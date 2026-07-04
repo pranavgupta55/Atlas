@@ -10,21 +10,110 @@
   <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css">
 </head>
-<body>
-  <header>
-    <div class="brand">Atlas</div>
-    <div class="status" id="status"></div>
-  </header>
+<body data-view="chat">
 
-  <main>
+  <!-- ── Topbar: [Atlas] [Chat] [Flow] [Plan] · session-cost · status ── -->
+  <div id="topbar">
+    <div class="brand">
+      <span class="brand-name">Atlas</span>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-view="chat">Chat</button>
+      <button class="tab" data-view="flow">Flow</button>
+      <button class="tab" data-view="plan">Plan</button>
+    </div>
+    <div class="topbar-right">
+      <span class="cost-pill" id="cost-pill" title="Click for cost breakdown">$0.00</span>
+      <span class="status-pill" id="status-pill">…</span>
+    </div>
+  </div>
+
+  <!-- ── Chat view ─────────────────────────────────────────────────── -->
+  <main id="view-chat" class="view active">
     <div id="messages" class="messages"></div>
-
     <div class="composer">
-      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…"></textarea>
+      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…  (⌘/Ctrl+Enter to send, /distill /sources /reset /cost)"></textarea>
       <button id="send">Send</button>
     </div>
   </main>
 
+  <!-- ── Flow view ─────────────────────────────────────────────────── -->
+  <main id="view-flow" class="view">
+    <div class="flow-layout">
+      <div class="flow-left">
+        <section class="flow-panel dag-panel">
+          <header class="flow-header">
+            <h2>Turn <span id="dag-turn-label">—</span></h2>
+            <span class="flow-hint">Click any node for details →</span>
+          </header>
+          <svg id="dag-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </section>
+        <section class="flow-panel cloud-panel">
+          <header class="flow-header">
+            <h2>Source cloud</h2>
+            <span class="flow-hint">node = source · edge = co-cited · color = current score</span>
+          </header>
+          <canvas id="cloud-canvas"></canvas>
+        </section>
+      </div>
+      <aside class="flow-right">
+        <section class="cost-panel">
+          <header class="flow-header"><h2>Cost</h2></header>
+          <div class="cost-summary">
+            <div class="cost-row cost-current">
+              <span class="k">This turn</span>
+              <span class="v" id="cost-turn">$0.00</span>
+            </div>
+            <div class="cost-row">
+              <span class="k">Session</span>
+              <span class="v" id="cost-session">$0.00</span>
+            </div>
+            <div class="cost-row">
+              <span class="k">Today</span>
+              <span class="v" id="cost-today">$0.00</span>
+            </div>
+          </div>
+          <div class="cost-breakdown" id="cost-breakdown"></div>
+        </section>
+        <section class="detail-panel" id="detail-panel">
+          <header class="flow-header">
+            <h2 id="detail-title">Details</h2>
+            <button class="close-btn" id="detail-close">×</button>
+          </header>
+          <div class="detail-body" id="detail-body">
+            <p class="dim">Select a node on the left to inspect it.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ── Plan view ─────────────────────────────────────────────────── -->
+  <main id="view-plan" class="view">
+    <div class="plan-toolbar">
+      <button id="distill-btn">Distill from conversation</button>
+      <span class="dim" id="plan-status"></span>
+    </div>
+    <article id="plan-content" class="plan-content"></article>
+
+    <!-- Distill approval modal -->
+    <div id="distill-modal" class="modal">
+      <div class="modal-inner">
+        <header class="modal-header">
+          <h2>Proposed business.md</h2>
+          <div class="modal-actions">
+            <button id="distill-reject" class="btn-outline">Reject</button>
+            <button id="distill-accept" class="btn-primary">Accept & save</button>
+          </div>
+        </header>
+        <div class="modal-body" id="distill-preview"></div>
+      </div>
+    </div>
+  </main>
+
   <script src="/web/chat.js"></script>
+  <script src="/web/flow.js"></script>
+  <script src="/web/plan.js"></script>
+  <script src="/web/app.js"></script>
 </body>
 </html>

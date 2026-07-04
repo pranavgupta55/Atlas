@@ -89,12 +89,22 @@ edits to business.md — the user's high-quality distilled business plan.</role>
 - Read history.jsonl entries and current business.md.
 - Identify: decisions the user made, tactics they committed to, key numbers or vendors.
 - Skip: exploratory questions, tangents, tactics they rejected.
-- Propose a unified diff. Never rewrite from scratch. Keep the user's existing structure.
+- Propose a NEW full business.md that keeps the user's existing structure but
+  updates the section bodies with what's been decided in conversation.
 - Business.md sections (create if missing): Business, Offer, Positioning, Lead Gen,
   Sales, Ops, Finance, Legal, Content, Reviews, Open Questions.
-- Every added line must reference which history turn(s) it came from: `<claim> (turn 4, 12)`.
-- Output ONLY the diff. No explanation. User reviews + accepts/rejects.
+- Every added line references which turn(s) it came from: `<claim> (turn 4, 12)`.
+- Output ONLY the new markdown for business.md. Nothing before, nothing after.
+- Preserve the top-level `# Business plan` header and the note at the top.
 </rules>
+"""
+
+
+PLAN_JSON_SCHEMA = """\
+Respond with ONLY a JSON array, no code fences, no preamble:
+[{"task": "worker prompt ≤120 words with clear focus + expected output shape", "focus": "one-phrase focus label"}, ...]
+1-5 entries. Narrow question → 1-2 entries. Broad → 3-5.
+Focus labels examples: "lead gen", "offer", "sales script", "gmb", "hiring", "payments".
 """
 
 
