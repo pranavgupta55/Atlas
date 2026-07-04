@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas</title>
+  <link rel="stylesheet" href="/web/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+  <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css">
+</head>
+<body>
+  <header>
+    <div class="brand">Atlas</div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <main>
+    <div id="messages" class="messages"></div>
+
+    <div class="composer">
+      <textarea id="input" rows="2" placeholder="Ask about lead gen, offer, sales scripts, GMB, hiring, ops, payments…"></textarea>
+      <button id="send">Send</button>
+    </div>
+  </main>
+
+  <script src="/web/chat.js"></script>
+</body>
+</html>
