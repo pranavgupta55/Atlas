@@ -38,6 +38,9 @@ window.Atlas = (function() {
     document.querySelectorAll(".tab").forEach(t => {
       t.classList.toggle("active", t.dataset.view === v);
     });
+    document.querySelectorAll(".view").forEach(el => {
+      el.classList.toggle("active", el.id === `view-${v}`);
+    });
     emit("view_change", v);
   }
   document.querySelectorAll(".tab").forEach(t => {

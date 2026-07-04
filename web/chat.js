@@ -224,6 +224,10 @@
 
   sendBtn.addEventListener("click", send);
   inputEl.addEventListener("keydown", e => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); send(); }
+    // Plain Enter sends. Shift+Enter (or Cmd/Ctrl+Enter) inserts a newline.
+    if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      send();
+    }
   });
 })();

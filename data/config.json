@@ -1,5 +1,5 @@
 {
-  "cheap_mode": false,
+  "cheap_mode": true,
   "orch_model": "claude-opus-4-7",
   "worker_model": "claude-sonnet-4-6",
   "merge_model": "claude-sonnet-4-6",
